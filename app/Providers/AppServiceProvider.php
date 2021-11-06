@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         //
         Builder::defaultStringLength(191);
         Schema::defaultStringLength(191);
+        JsonResource::withoutWrapping();
 
     }
 }

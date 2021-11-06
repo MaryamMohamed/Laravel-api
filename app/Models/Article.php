@@ -15,8 +15,9 @@ class Article extends Model
         'user_id',
     ];
 
-    /*protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];*/
+    public function user ()
+    {
+        # code...
+        return $this->belongsTo(User::class);
+    }
 }

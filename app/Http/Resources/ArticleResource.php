@@ -19,9 +19,17 @@ class ArticleResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'body' => $this->body,
-            'user_id' => $this->user_id,
+            'user' => $this->user->name,
             'created' => $this->created_at->diffForHumans(),
 
         ];
     }
+
+/*    public function with ($request)
+    {
+        # code...
+        return [
+
+        ];
+    }*/
 }

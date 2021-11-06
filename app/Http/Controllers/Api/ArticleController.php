@@ -17,7 +17,7 @@ class ArticleController extends Controller
     public function index()
     {
         //
-        return ArticleResource::collection(Article::paginate(5));
+        return ArticleResource::collection(Article::all());
     }
 
     /**
@@ -29,6 +29,14 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            'user_id' => 'required|numeric',
+        ]
+        );
+        $article = Article::create($request->all());
+        return new ArticleResource($article);
     }
 
     /**
@@ -40,6 +48,12 @@ class ArticleController extends Controller
     public function show($id)
     {
         //
+        $article = Article::find($id);
+        if (! $article) {
+            # code...
+            return $this->notFound();
+        }
+        return new ArticleResource($article);
     }
 
     /**
@@ -52,6 +66,20 @@ class ArticleController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            'user_id' => 'required|numeric',
+        ]
+        );
+        $article = Article::find($id);
+
+        if (!$article) {
+            # code...
+            return $this->notFound();
+        }
+        $article->update($request->all());
+        return new ArticleResource($article);
     }
 
     /**
@@ -63,5 +91,30 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         //
+        $article = Article::find($id);
+
+        if (!$article) {
+            # code...
+            return $this->notFound();
+        }
+        if($article->delete()){
+            return response()->json(['data'=>[], 'status'=>200, 'message'=>'Article Deleted'], 200);
+        }else {
+            # code...
+            return response()->json(['data'=>[], 'status'=>500, 'message'=>'Something went wrong'], 500);
+        }
+        return $article;
+    }
+
+    public function notFound()
+    {
+        # code...
+        $data = [
+            'data'=>[],
+            'status'=>false,
+            'status_code'=>404,
+            'message'=>'Article not found, no such article in database'
+        ];
+        return response()->json($data, 404);
     }
 }
