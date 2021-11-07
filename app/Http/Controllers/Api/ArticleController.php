@@ -9,6 +9,16 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+/*    function __construct()
+    {
+        # code...
+        $this->middleware()->only();
+    }
+*/
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except(['index', 'show']); //use middleware on all functions except index method only
+    }
     /**
      * Display a listing of the resource.
      *
@@ -32,10 +42,13 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required',
             'body' => 'required',
-            'user_id' => 'required|numeric',
-        ]
-        );
-        $article = Article::create($request->all());
+        ]);
+
+        if(auth()->check()){
+            $request->merge(['user_id' => auth()->user()->id]);
+            $article = Article::create($request->all());
+        }
+        //$article = Article::create($request->all());
         return new ArticleResource($article);
     }
 
@@ -69,10 +82,9 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required',
             'body' => 'required',
-            'user_id' => 'required|numeric',
-        ]
-        );
-        $article = Article::find($id);
+        ]);
+        
+        $article = auth()->user()->articles()->find($id);
 
         if (!$article) {
             # code...
@@ -91,7 +103,7 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         //
-        $article = Article::find($id);
+        $article = auth()->user()->articles()->find($id);
 
         if (!$article) {
             # code...
@@ -116,5 +128,12 @@ class ArticleController extends Controller
             'message'=>'Article not found, no such article in database'
         ];
         return response()->json($data, 404);
+    }
+
+    public function logout()
+    {
+        # code...
+        auth()->user()->token()->revoke();
+        auth()->user()->token()->delete();
     }
 }
